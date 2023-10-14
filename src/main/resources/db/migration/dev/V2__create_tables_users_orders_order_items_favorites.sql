@@ -13,12 +13,12 @@ CREATE TABLE users
 CREATE TABLE orders
 (
     order_id bigserial primary key ,
-    user_id bigint not null REFERENCES users (user_id),
+    user_id bigint not null references users (user_id),
     order_date timestamp,
     status varchar(255)
 );
 
-CREATE TABLE cart_items
+CREATE TABLE order_items
 (
     book_id bigint not null references books (book_id),
     order_id bigint not null references orders (order_id),

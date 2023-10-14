@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Embeddable
-public class CartItemId implements Serializable {
+public class OrderItemId implements Serializable {
 
   @Column(name = "book_id", nullable = false)
   private Long bookId;

@@ -9,19 +9,17 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "cart_items")
-public class CartItem {
+@Table(name = "order_items")
+public class OrderItem {
 
   @EmbeddedId
-  private CartItemId id;
+  private OrderItemId id;
 
   @ManyToOne
   @JoinColumn(name = "book_id", insertable = false, updatable = false)

@@ -1,14 +1,26 @@
 version: '3.9'
 services:
-  postgres:
+#  postgres-dev:
+#    image: postgres:16
+#    container_name: web_store_dev_db
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: password
+#      POSTGRES_DB: web_store_dev_db
+#    volumes:
+#      - /c/Users/Vladimir/postgres-dev:/var/lib/postgresql/data
+#    ports:
+#      - "5432:5432"
+
+  postgres-local:
     image: postgres:16
-    container_name: web_store_test_db
+    container_name: web_store_local_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: web_store_test_db
+      POSTGRES_DB: web_store_local_db
     volumes:
-      - /c/Users/Vladimir/postgres:/var/lib/postgresql/data
+      - /c/Users/Vladimir/postgres-local:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 

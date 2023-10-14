@@ -18,7 +18,6 @@ public class FavoriteId implements Serializable {
 
   @Column(name = "book_id", nullable = false)
   private Long bookId;
-
 }
 
 

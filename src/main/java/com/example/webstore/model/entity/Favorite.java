@@ -26,5 +26,4 @@ public class Favorite {
   @ManyToOne
   @JoinColumn(name = "book_id", insertable = false, updatable = false)
   private Book book;
-
 }

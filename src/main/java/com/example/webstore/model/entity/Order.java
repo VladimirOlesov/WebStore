@@ -1,31 +1,28 @@
 package com.example.webstore.model.entity;
 
+import com.example.webstore.model.enums.OrderStatus;
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
+@AttributeOverride(name = "Id", column = @Column(name = "order_id"))
 @Table(name = "orders")
-public class Order {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "order_id")
-  private Long orderId;
+public class Order extends BaseEntity {
 
   @ManyToOne
   @JoinColumn(name = "user_id", nullable = false)
@@ -34,7 +31,8 @@ public class Order {
   @Column(name = "order_date")
   private Timestamp orderDate;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "status")
-  private String status;
+  private OrderStatus status;
 }
 

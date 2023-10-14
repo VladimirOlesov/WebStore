@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/web_store_dev_db
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    url: jdbc:postgresql://localhost:5432/web_store_dev_db
+    user: postgres
+    password: password
+    locations: classpath:db/migration/dev
+
+
+
+
