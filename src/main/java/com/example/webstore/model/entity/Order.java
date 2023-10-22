@@ -7,9 +7,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,5 +38,12 @@ public class Order extends BaseEntity {
   @Enumerated(EnumType.STRING)
   @Column(name = "status")
   private OrderStatus status;
-}
 
+  @ManyToMany
+  @JoinTable(
+      name = "orders_books",
+      joinColumns = @JoinColumn(name = "order_id"),
+      inverseJoinColumns = @JoinColumn(name = "book_id")
+  )
+  private Set<Book> books = new HashSet<>();
+}

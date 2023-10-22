@@ -1,8 +1,11 @@
 spring:
+
   profiles:
     active: local
+
   flyway:
     enabled: true
+
   jpa:
     open-in-view: false
     hibernate:
@@ -12,4 +15,6 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-
+jwt:
+  secret: AWqtLP+GFvnUBbpn1vbTpgmz8fwk6G14nQEVgJIBIVg=
+  expiration: 86400000

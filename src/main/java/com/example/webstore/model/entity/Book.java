@@ -3,18 +3,18 @@ package com.example.webstore.model.entity;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import java.math.BigDecimal;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -27,10 +27,12 @@ public class Book extends BaseEntity {
   @Column(name = "title", nullable = false)
   private String title;
 
+  @NotNull
   @ManyToOne
   @JoinColumn(name = "author_id", nullable = false)
   private Author author;
 
+  @NotNull
   @ManyToOne
   @JoinColumn(name = "genre_id", nullable = false)
   private Genre genre;

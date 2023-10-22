@@ -22,7 +22,3 @@ CREATE TABLE books
     page_count       int,
     age_rating       int
 );
-
-
-
-
