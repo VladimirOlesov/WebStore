@@ -21,7 +21,8 @@ CREATE TABLE orders
 CREATE TABLE orders_books
 (
     order_id bigint not null references orders (order_id),
-    book_id  bigint not null references books (book_id)
+    book_id  bigint not null references books (book_id),
+    primary key (order_id, book_id)
 );
 
 CREATE TABLE favorites

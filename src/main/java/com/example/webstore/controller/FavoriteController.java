@@ -17,20 +17,22 @@ import org.springframework.web.bind.annotation.RestController;
 public class FavoriteController {
 
   // Получение списка избранных книг пользователя
-  @GetMapping("/{userId}")
-  public ResponseEntity<List<BookDto>> getFavorites(@PathVariable Long userId) {
+  @GetMapping("/{bookId}")
+  public ResponseEntity<List<BookDto>> getFavorites(@PathVariable Long bookId) {
     return null;
   }
 
   // Добавление книги в список избранных
-  @PostMapping("/add/{userId}/{bookId}")
-  public ResponseEntity<BookDto> addToFavorites(@PathVariable Long userId, @PathVariable Long bookId) {
+  @PostMapping("/{bookId}")
+  public ResponseEntity<BookDto> addToFavorites(
+      @PathVariable Long bookId) {
     return null;
   }
 
   // Удаление книги из списка избранных
-  @DeleteMapping("/remove/{userId}/{bookId}")
-  public ResponseEntity<Void> removeFromFavorites(@PathVariable Long userId, @PathVariable Long bookId) {
+  @DeleteMapping("/{bookId}")
+  public ResponseEntity<Void> removeFromFavorites(
+      @PathVariable Long bookId) {
     return null;
   }
 }

@@ -1,18 +1,19 @@
 package com.example.webstore.service.impl;
 
 import com.example.webstore.exception.DuplicateUserException;
-import com.example.webstore.exception.EntityNotFoundException;
 import com.example.webstore.model.dto.UserDtoRegister;
 import com.example.webstore.repository.UserRepository;
 import com.example.webstore.service.JwtService;
 import com.example.webstore.model.dto.UserDtoLogin;
 import com.example.webstore.service.AuthService;
 import com.example.webstore.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -27,6 +28,7 @@ public class AuthServiceImpl implements AuthService {
   private final UserRepository userRepository;
 
   @Override
+  @Transactional
   public UserDtoRegister register(UserDtoRegister userDto) {
 
     if (userRepository.existsByUsername(

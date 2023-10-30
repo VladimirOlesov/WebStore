@@ -1,15 +1,16 @@
 package com.example.webstore.service.impl;
 
-import com.example.webstore.exception.EntityNotFoundException;
 import com.example.webstore.model.dto.UserDtoRegister;
 import com.example.webstore.model.entity.User;
 import com.example.webstore.model.mapper.UserMapper;
 import com.example.webstore.repository.UserRepository;
 import com.example.webstore.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -34,6 +35,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional
   public UserDtoRegister save(UserDtoRegister userDtoRegister) {
     User user = userMapper.userDtoToUser(userDtoRegister);
     userRepository.save(user);
