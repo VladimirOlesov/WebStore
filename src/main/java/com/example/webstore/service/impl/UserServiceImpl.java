@@ -2,6 +2,7 @@ package com.example.webstore.service.impl;
 
 import com.example.webstore.model.dto.UserDtoRegister;
 import com.example.webstore.model.entity.User;
+import com.example.webstore.model.enums.Role;
 import com.example.webstore.model.mapper.UserMapper;
 import com.example.webstore.repository.UserRepository;
 import com.example.webstore.service.UserService;
@@ -37,7 +38,8 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public UserDtoRegister save(UserDtoRegister userDtoRegister) {
-    User user = userMapper.userDtoToUser(userDtoRegister);
+    var user = userMapper.userDtoToUser(userDtoRegister);
+    user.setRole(Role.USER);
     userRepository.save(user);
     return userMapper.convertToDto(user);
   }

@@ -3,9 +3,6 @@ spring:
   profiles:
     active: local
 
-  flyway:
-    enabled: true
-
   jpa:
     open-in-view: false
     hibernate:
@@ -19,3 +16,8 @@ spring:
 jwt:
   secret: AWqtLP+GFvnUBbpn1vbTpgmz8fwk6G14nQEVgJIBIVg=
   expiration: 86400000
+
+book:
+  covers:
+    upload:
+      path: bookCovers

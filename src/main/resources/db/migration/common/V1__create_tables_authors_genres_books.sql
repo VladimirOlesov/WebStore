@@ -18,7 +18,8 @@ CREATE TABLE books
     genre_id         bigint references genres (genre_id),
     publication_year int,
     price            decimal(8, 2),
-    ISBN             VARCHAR(20)  not null,
+    ISBN             varchar(20)  not null,
     page_count       int,
-    age_rating       int
+    age_rating       int,
+    cover_path       varchar(255)
 );

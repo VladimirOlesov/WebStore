@@ -1,7 +1,8 @@
 package com.example.webstore.controller;
 
-
 import com.example.webstore.model.dto.BookDto;
+import com.example.webstore.service.BookService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,9 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/admin/book")
 public class AdminBookController {
+
+  private final BookService bookService;
 
   // Создание новой книги
   @PostMapping
@@ -26,9 +30,9 @@ public class AdminBookController {
 
   // Загрузка изображения книги
   @PostMapping("/{bookId}/upload-image")
-  public ResponseEntity<Void> uploadImage(@PathVariable Long bookId,
+  public ResponseEntity<String> uploadImage(@PathVariable Long bookId,
       @RequestParam("file") MultipartFile file) {
-    return null;
+    return ResponseEntity.ok(bookService.saveBookCover(bookId, file));
   }
 
   // Обновление информации о книге по ее id
@@ -41,7 +45,8 @@ public class AdminBookController {
   // Удаление книги по ее id
   @DeleteMapping("/{bookId}")
   public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
-    return null;
+    bookService.deleteBookById(bookId);
+    return ResponseEntity.ok().build();
   }
 
 }

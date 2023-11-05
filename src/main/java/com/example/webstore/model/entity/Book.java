@@ -51,4 +51,11 @@ public class Book extends BaseEntity {
 
   @Column(name = "age_rating")
   private Integer ageRating;
+
+  @Column(name = "cover_path")
+  private String coverPath;
+
+  public Book(Long id) {
+    this.setId(id);
+  }
 }

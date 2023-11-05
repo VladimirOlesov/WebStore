@@ -1,7 +1,13 @@
 package com.example.webstore.model;
 
+import com.example.webstore.model.entity.Author_;
 import com.example.webstore.model.entity.Book;
+import com.example.webstore.model.entity.Book_;
+
+import com.example.webstore.model.entity.Genre_;
+import com.example.webstore.model.enums.SortBy;
 import com.example.webstore.model.enums.SortDirection;
+import java.math.BigDecimal;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -12,7 +18,7 @@ public class BookSpecifications {
       if (StringUtils.isEmpty(title)) {
         return criteriaBuilder.conjunction();
       }
-      return criteriaBuilder.like(root.get("title"), "%" + title + "%");
+      return criteriaBuilder.like(root.get(Book_.title), "%"+ title + "%");
     };
   }
 
@@ -21,7 +27,7 @@ public class BookSpecifications {
       if (authorId == null) {
         return criteriaBuilder.conjunction();
       }
-      return criteriaBuilder.equal(root.get("author").get("id"), authorId);
+      return criteriaBuilder.equal(root.get(Book_.author).get(Author_.Id), authorId);
     };
   }
 
@@ -30,50 +36,43 @@ public class BookSpecifications {
       if (genreId == null) {
         return criteriaBuilder.conjunction();
       }
-      return criteriaBuilder.equal(root.get("genre").get("id"), genreId);
+      return criteriaBuilder.equal(root.get(Book_.genre).get(Genre_.Id), genreId);
     };
   }
 
-  public static Specification<Book> priceBetween(Double minPrice, Double maxPrice) {
+  public static Specification<Book> priceBetween(BigDecimal minPrice, BigDecimal maxPrice) {
     return (root, query, criteriaBuilder) -> {
       if (minPrice == null && maxPrice == null) {
         return criteriaBuilder.conjunction();
       }
       if (minPrice != null && maxPrice != null) {
-        return criteriaBuilder.between(root.get("price"), minPrice, maxPrice);
+        return criteriaBuilder.between(root.get(Book_.price), minPrice, maxPrice);
       } else if (minPrice != null) {
-        return criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice);
+        return criteriaBuilder.greaterThanOrEqualTo(root.get(Book_.price), minPrice);
       } else {
-        return criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice);
+        return criteriaBuilder.lessThanOrEqualTo(root.get(Book_.price), maxPrice);
       }
     };
   }
 
-  public static Specification<Book> orderByPrice(SortDirection sortDirection) {
+  public static Specification<Book> orderBy(SortBy sortBy, SortDirection sortDirection) {
     return (root, query, criteriaBuilder) -> {
-      if (sortDirection == SortDirection.ASC) {
-        query.orderBy(criteriaBuilder.asc(root.get("price")));
-      } else {
-        query.orderBy(criteriaBuilder.desc(root.get("price")));
-      }
-      return query.getRestriction();
-    };
-  }
+      var order = criteriaBuilder.asc(root.get(Book_.title));
 
-  public static Specification<Book> orderByPublicationYear(SortDirection sortDirection) {
-    {
-      return (root, query, criteriaBuilder) -> {
-        if (sortDirection == SortDirection.ASC) {
-          query.orderBy(criteriaBuilder.asc(root.get("publicationYear")));
+      switch (sortBy) {
+        case TITLE -> order = criteriaBuilder.asc(root.get(Book_.title));
+        case PUBLICATION_YEAR -> order = criteriaBuilder.asc(root.get(Book_.publicationYear));
+        case PRICE -> {
+          if (sortDirection == SortDirection.DESC) {
+            order = criteriaBuilder.desc(root.get(Book_.price));
+          } else {
+            order = criteriaBuilder.asc(root.get(Book_.price));
+          }
         }
-        return query.getRestriction();
-      };
-    }
-  }
+      }
 
-  public static Specification<Book> orderByTitle() {
-    return (root, query, criteriaBuilder) -> {
-      query.orderBy(criteriaBuilder.asc(root.get("title")));
+      query.orderBy(order);
+
       return query.getRestriction();
     };
   }

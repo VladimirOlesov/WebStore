@@ -28,21 +28,24 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
+    return http
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/**").permitAll()
+            .requestMatchers("/auth/**", "/books/**").permitAll()
+            .requestMatchers("/user/**", "/favorites/**", "/orders")
+            .hasAnyAuthority("USER", "ADMIN")
+            .requestMatchers("/admin/**").hasAuthority("ADMIN")
             .anyRequest().authenticated())
         .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
         .authenticationProvider(authenticationProvider())
         .addFilterBefore(jwtAuthenticationFilter,
-            UsernamePasswordAuthenticationFilter.class);
-    return http.build();
+            UsernamePasswordAuthenticationFilter.class)
+        .build();
   }
 
   @Bean
   public AuthenticationProvider authenticationProvider() {
-    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+    var authProvider = new DaoAuthenticationProvider();
     authProvider.setUserDetailsService(userService.userDetailsService());
     authProvider.setPasswordEncoder(passwordEncoder);
     return authProvider;

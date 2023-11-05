@@ -41,6 +41,7 @@ public class Order extends BaseEntity {
   @Column(name = "status")
   private OrderStatus status;
 
+  @Builder.Default
   @ManyToMany
   @JoinTable(
       name = "orders_books",

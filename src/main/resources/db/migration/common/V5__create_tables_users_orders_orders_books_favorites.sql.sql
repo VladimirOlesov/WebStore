@@ -7,7 +7,8 @@ CREATE TABLE users
     phone_number      varchar(255),
     registration_date timestamp,
     first_name        varchar(255),
-    last_name         varchar(255)
+    last_name         varchar(255),
+    role              varchar(255) not null
 );
 
 CREATE TABLE orders

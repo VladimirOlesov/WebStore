@@ -1,20 +1,27 @@
 package com.example.webstore.service.impl;
 
+import com.example.webstore.exception.BookCoverStorageException;
 import com.example.webstore.model.BookSpecifications;
 import com.example.webstore.model.dto.BookDto;
 import com.example.webstore.model.entity.Book;
+import com.example.webstore.model.enums.SortBy;
 import com.example.webstore.model.enums.SortDirection;
 import com.example.webstore.model.mapper.BookMapper;
 import com.example.webstore.repository.BookRepository;
 import com.example.webstore.service.BookService;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -23,34 +30,27 @@ public class BookServiceImpl implements BookService {
   private final BookRepository bookRepository;
   private final BookMapper bookMapper;
 
+  @Value("${book.covers.upload.path}")
+  private String uploadPath;
+
   @Override
   public Page<BookDto> getAllBooks(
       String title,
       Long authorId,
       Long genreId,
-      Double minPrice,
-      Double maxPrice,
-      boolean ascendingPrice,
-      boolean descendingPrice,
-      boolean ascendingPublicationYear,
+      BigDecimal minPrice,
+      BigDecimal maxPrice,
+      SortBy sortBy,
+      SortDirection sortDirection,
       Pageable pageable) {
-    Specification<Book> spec = Specification
+    var spec = Specification
         .where(BookSpecifications.titleContains(title))
         .and(BookSpecifications.authorIs(authorId))
         .and(BookSpecifications.genreIs(genreId))
-        .and(BookSpecifications.priceBetween(minPrice, maxPrice));
+        .and(BookSpecifications.priceBetween(minPrice, maxPrice))
+        .and(BookSpecifications.orderBy(sortBy, sortDirection));
 
-    if (ascendingPrice) {
-      spec = spec.and(BookSpecifications.orderByPrice(SortDirection.ASC));
-    } else if (descendingPrice) {
-      spec = spec.and(BookSpecifications.orderByPrice(SortDirection.DESC));
-    }
-
-    if (ascendingPublicationYear) {
-      spec = spec.and(BookSpecifications.orderByPublicationYear(SortDirection.ASC));
-    }
-
-    Page<Book> books = bookRepository.findAll(spec, pageable);
+    var books = bookRepository.findAll(spec, pageable);
 
     if (books.isEmpty()) {
       throw new EntityNotFoundException("Книги не найдены");
@@ -66,7 +66,44 @@ public class BookServiceImpl implements BookService {
   }
 
   @Override
-  public Optional<Book> getBookByISBN(String isbn) {
-    return bookRepository.findByISBN(isbn);
+  public Book getBookByISBN(String isbn) {
+    return bookRepository.findByISBN(isbn)
+        .orElseThrow(() -> new EntityNotFoundException("Книга не найдена"));
+  }
+
+  @Override
+  @Transactional
+  public void deleteBookById(Long bookId) {
+    bookRepository.delete(bookRepository.findById(bookId)
+        .orElseThrow(() -> new EntityNotFoundException("Книга не найдена")));
+  }
+
+  @Override
+  @Transactional
+  public String saveBookCover(Long bookId, MultipartFile file) {
+    if (file == null || file.isEmpty()) {
+      throw new IllegalArgumentException("Файл не передан или пуст");
+    }
+
+    var book = bookRepository.findById(bookId)
+        .orElseThrow(() -> new EntityNotFoundException("Книга не найдена"));
+
+    var fileName = file.getOriginalFilename();
+    var filePath = Paths.get(uploadPath, fileName).toString();
+
+    try {
+      Files.createDirectories(Paths.get(uploadPath));
+
+      Files.write(Paths.get(filePath), file.getBytes());
+      book.setCoverPath(filePath);
+      bookRepository.save(book);
+      return filePath;
+    } catch (IOException e) {
+      if (Files.notExists(Paths.get(uploadPath))) {
+        throw new BookCoverStorageException("Ошибка при создании папки для сохранения обложки");
+      } else {
+        throw new BookCoverStorageException("Ошибка при сохранении файла обложки");
+      }
+    }
   }
 }
