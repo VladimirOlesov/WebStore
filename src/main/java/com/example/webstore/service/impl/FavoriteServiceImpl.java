@@ -1,10 +1,11 @@
 package com.example.webstore.service.impl;
 
-
 import com.example.webstore.model.dto.BookDto;
+import com.example.webstore.model.dto.FavoriteIdDto;
 import com.example.webstore.model.entity.Favorite;
 import com.example.webstore.model.entity.FavoriteId;
 import com.example.webstore.model.mapper.BookMapper;
+import com.example.webstore.model.mapper.FavoriteMapper;
 import com.example.webstore.repository.BookRepository;
 import com.example.webstore.repository.FavoriteRepository;
 import com.example.webstore.service.FavoriteService;
@@ -25,6 +26,7 @@ public class FavoriteServiceImpl implements FavoriteService {
   private final BookMapper bookMapper;
   private final UserService userService;
   private final BookRepository bookRepository;
+  private final FavoriteMapper favoriteMapper;
 
 
   @Override
@@ -41,7 +43,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
   @Override
   @Transactional
-  public FavoriteId addToFavorites(Long bookId) {
+  public FavoriteIdDto addToFavorites(Long bookId) {
     var username = SecurityContextHolder.getContext().getAuthentication().getName();
     var user = userService.getUserByUsername(username);
     var book = bookRepository.findById(bookId)
@@ -52,7 +54,7 @@ public class FavoriteServiceImpl implements FavoriteService {
         .user(user)
         .book(book)
         .build());
-    return favorite.getId();
+    return favoriteMapper.favoriteIdToDto(favorite.getId());
   }
 
   @Override

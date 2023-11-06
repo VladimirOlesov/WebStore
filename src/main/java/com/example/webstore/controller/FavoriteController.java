@@ -1,7 +1,7 @@
 package com.example.webstore.controller;
 
 import com.example.webstore.model.dto.BookDto;
-import com.example.webstore.model.entity.FavoriteId;
+import com.example.webstore.model.dto.FavoriteIdDto;
 import com.example.webstore.service.FavoriteService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class FavoriteController {
 
   // Добавление книги в список избранных
   @PostMapping("/{bookId}")
-  public ResponseEntity<FavoriteId> addToFavorites(@PathVariable Long bookId) {
+  public ResponseEntity<FavoriteIdDto> addToFavorites(@PathVariable Long bookId) {
     return ResponseEntity.ok(favoriteService.addToFavorites(bookId));
   }
 
