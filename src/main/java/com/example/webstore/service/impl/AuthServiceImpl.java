@@ -11,7 +11,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
         new UsernamePasswordAuthenticationToken(userDtoLogin.username(),
             userDtoLogin.password()));
 
-    UserDetails user = userRepository.findByUsername(userDtoLogin.username())
+    var user = userRepository.findByUsername(userDtoLogin.username())
         .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
     return jwtService.generateToken(user);
   }

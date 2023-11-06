@@ -1,6 +1,7 @@
 package com.example.webstore.controller;
 
 import com.example.webstore.model.dto.BookDto;
+import com.example.webstore.service.FavoriteService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,23 +17,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/favorites")
 public class FavoriteController {
 
+  private final FavoriteService favoriteService;
+
   // Получение списка избранных книг пользователя
-  @GetMapping("/{bookId}")
-  public ResponseEntity<List<BookDto>> getFavorites(@PathVariable Long bookId) {
-    return null;
+  @GetMapping
+  public ResponseEntity<List<BookDto>> getFavoriteBooks() {
+    return ResponseEntity.ok(favoriteService.getFavoriteBooks());
   }
 
   // Добавление книги в список избранных
   @PostMapping("/{bookId}")
-  public ResponseEntity<BookDto> addToFavorites(
-      @PathVariable Long bookId) {
-    return null;
+  public ResponseEntity<Void> addToFavorites(@PathVariable Long bookId) {
+    favoriteService.addToFavorites(bookId);
+    return ResponseEntity.ok().build();
   }
 
   // Удаление книги из списка избранных
   @DeleteMapping("/{bookId}")
-  public ResponseEntity<Void> removeFromFavorites(
-      @PathVariable Long bookId) {
-    return null;
+  public ResponseEntity<Void> removeFromFavorites(@PathVariable Long bookId) {
+    favoriteService.removeFromFavorites(bookId);
+    return ResponseEntity.ok().build();
   }
 }

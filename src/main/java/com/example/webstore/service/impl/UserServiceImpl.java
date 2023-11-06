@@ -7,7 +7,6 @@ import com.example.webstore.model.mapper.UserMapper;
 import com.example.webstore.repository.UserRepository;
 import com.example.webstore.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -21,8 +20,9 @@ public class UserServiceImpl implements UserService {
   private final UserMapper userMapper;
 
   @Override
-  public Optional<User> getUserByUsername(String username) {
-    return userRepository.findByUsername(username);
+  public User getUserByUsername(String username) {
+    return userRepository.findByUsername(username)
+        .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
   }
 
   @Override

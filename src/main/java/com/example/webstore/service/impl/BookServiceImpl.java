@@ -34,7 +34,7 @@ public class BookServiceImpl implements BookService {
   private String uploadPath;
 
   @Override
-  public Page<BookDto> getAllBooks(
+  public Page<BookDto> getBooks(
       String title,
       Long authorId,
       Long genreId,
@@ -60,9 +60,10 @@ public class BookServiceImpl implements BookService {
   }
 
   @Override
-  public Book getBookById(Long bookId) {
-    return bookRepository.findById(bookId)
+  public BookDto getBookById(Long bookId) {
+    var book = bookRepository.findById(bookId)
         .orElseThrow(() -> new EntityNotFoundException("Книга не найдена"));
+    return bookMapper.bookToBookDto(book);
   }
 
   @Override
@@ -88,8 +89,7 @@ public class BookServiceImpl implements BookService {
     var book = bookRepository.findById(bookId)
         .orElseThrow(() -> new EntityNotFoundException("Книга не найдена"));
 
-    var fileName = file.getOriginalFilename();
-    var filePath = Paths.get(uploadPath, fileName).toString();
+    var filePath = Paths.get(uploadPath, file.getOriginalFilename()).toString();
 
     try {
       Files.createDirectories(Paths.get(uploadPath));
@@ -97,7 +97,9 @@ public class BookServiceImpl implements BookService {
       Files.write(Paths.get(filePath), file.getBytes());
       book.setCoverPath(filePath);
       bookRepository.save(book);
+
       return filePath;
+
     } catch (IOException e) {
       if (Files.notExists(Paths.get(uploadPath))) {
         throw new BookCoverStorageException("Ошибка при создании папки для сохранения обложки");

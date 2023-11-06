@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface BookService {
 
-  Page<BookDto> getAllBooks(
+  Page<BookDto> getBooks(
       String title,
       Long authorId,
       Long genreId,
@@ -21,7 +21,7 @@ public interface BookService {
       SortDirection sortDirection,
       Pageable pageable);
 
-  Book getBookById(Long bookId);
+  BookDto getBookById(Long bookId);
 
   Book getBookByISBN(String isbn);
 

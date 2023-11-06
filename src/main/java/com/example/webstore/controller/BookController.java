@@ -39,7 +39,7 @@ public class BookController {
       @RequestParam(name = "page", defaultValue = "0") int page,
       @RequestParam(name = "size", defaultValue = "1") int size) {
     var pageable = PageRequest.of(page, size);
-    var books = bookService.getAllBooks(title, authorId, genreId, minPrice, maxPrice,
+    var books = bookService.getBooks(title, authorId, genreId, minPrice, maxPrice,
         sortBy, sortDirection, pageable);
     return ResponseEntity.ok(books);
   }
@@ -47,8 +47,7 @@ public class BookController {
   // Получение книги по ее id
   @GetMapping("/{bookId}")
   public ResponseEntity<BookDto> getBookById(@PathVariable Long bookId) {
-    var bookDto = bookMapper.bookToBookDto(bookService.getBookById(bookId));
-    return ResponseEntity.ok(bookDto);
+    return ResponseEntity.ok(bookService.getBookById(bookId));
   }
 
   // Поиск книг по id автора
