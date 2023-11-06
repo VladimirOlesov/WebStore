@@ -41,17 +41,18 @@ public class FavoriteServiceImpl implements FavoriteService {
 
   @Override
   @Transactional
-  public void addToFavorites(Long bookId) {
+  public FavoriteId addToFavorites(Long bookId) {
     var username = SecurityContextHolder.getContext().getAuthentication().getName();
     var user = userService.getUserByUsername(username);
     var book = bookRepository.findById(bookId)
         .orElseThrow(() -> new EntityNotFoundException("Книга не найдена"));
 
-    favoriteRepository.save(Favorite.builder()
+    var favorite = favoriteRepository.save(Favorite.builder()
         .id(new FavoriteId(user.getId(), book.getId()))
         .user(user)
         .book(book)
         .build());
+    return favorite.getId();
   }
 
   @Override
