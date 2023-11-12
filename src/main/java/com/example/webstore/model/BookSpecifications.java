@@ -3,11 +3,11 @@ package com.example.webstore.model;
 import com.example.webstore.model.entity.Author_;
 import com.example.webstore.model.entity.Book;
 import com.example.webstore.model.entity.Book_;
-
 import com.example.webstore.model.entity.Genre_;
 import com.example.webstore.model.enums.SortBy;
 import com.example.webstore.model.enums.SortDirection;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -18,7 +18,8 @@ public class BookSpecifications {
       if (StringUtils.isEmpty(title)) {
         return criteriaBuilder.conjunction();
       }
-      return criteriaBuilder.like(root.get(Book_.title), "%"+ title + "%");
+      return criteriaBuilder.like(root.get(Book_.title),
+          MessageFormat.format("%{0}%", title));
     };
   }
 
@@ -56,24 +57,21 @@ public class BookSpecifications {
   }
 
   public static Specification<Book> orderBy(SortBy sortBy, SortDirection sortDirection) {
+    if (sortBy == null || sortDirection == null) {
+      throw new IllegalArgumentException("Параметры сортировки имеют недопустимые значения");
+    }
+
     return (root, query, criteriaBuilder) -> {
-      var order = criteriaBuilder.asc(root.get(Book_.title));
 
-      switch (sortBy) {
-        case TITLE -> order = criteriaBuilder.asc(root.get(Book_.title));
-        case PUBLICATION_YEAR -> order = criteriaBuilder.asc(root.get(Book_.publicationYear));
-        case PRICE -> {
-          if (sortDirection == SortDirection.DESC) {
-            order = criteriaBuilder.desc(root.get(Book_.price));
-          } else {
-            order = criteriaBuilder.asc(root.get(Book_.price));
-          }
-        }
-      }
-
-      query.orderBy(order);
+      query.orderBy((sortDirection == SortDirection.DESC) ?
+          criteriaBuilder.desc(root.get(sortBy.getField())) :
+          criteriaBuilder.asc(root.get(sortBy.getField())));
 
       return query.getRestriction();
     };
+  }
+
+  public static Specification<Book> notDeleted() {
+    return ((root, query, criteriaBuilder) -> criteriaBuilder.isFalse(root.get(Book_.isDeleted)));
   }
 }

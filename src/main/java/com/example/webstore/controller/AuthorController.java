@@ -19,7 +19,7 @@ public class AuthorController {
 
   @GetMapping
   public ResponseEntity<List<AuthorDto>> gerAuthors(
-      @RequestParam(name = "name", required = false) String name) {
-    return ResponseEntity.ok(authorService.getAuthors(name));
+      @RequestParam(name = "name", required = false) String authorName) {
+    return ResponseEntity.ok(authorService.getAuthors(authorName));
   }
 }

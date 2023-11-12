@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/admin/book")
+@RequestMapping("/admin/books")
 public class AdminBookController {
 
   private final BookService bookService;
@@ -29,7 +29,7 @@ public class AdminBookController {
   }
 
   // Загрузка изображения книги
-  @PostMapping("/{bookId}/upload-image")
+  @PostMapping("/{bookId}/image")
   public ResponseEntity<String> uploadImage(@PathVariable Long bookId,
       @RequestParam("file") MultipartFile file) {
     return ResponseEntity.ok(bookService.saveBookCover(bookId, file));
@@ -48,5 +48,4 @@ public class AdminBookController {
     bookService.deleteBookById(bookId);
     return ResponseEntity.ok().build();
   }
-
 }

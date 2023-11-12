@@ -1,5 +1,5 @@
 INSERT INTO orders (user_id, order_date, status)
-VALUES (1, current_timestamp, 'IN_CART');
+VALUES (1, null, 'IN_CART');
 
 INSERT INTO orders_books (order_id, book_id)
 SELECT (SELECT order_id

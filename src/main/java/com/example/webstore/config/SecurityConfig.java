@@ -32,7 +32,7 @@ public class SecurityConfig {
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/auth/**", "/books/**", "/authors/**", "/genres/**").permitAll()
-            .requestMatchers("/user/**", "/favorites/**", "/orders")
+            .requestMatchers("/user/**", "/favorites/**", "/orders/**")
             .hasAnyAuthority("USER", "ADMIN")
             .requestMatchers("/admin/**").hasAuthority("ADMIN")
             .anyRequest().authenticated())
@@ -45,7 +45,7 @@ public class SecurityConfig {
 
   @Bean
   public AuthenticationProvider authenticationProvider() {
-    var authProvider = new DaoAuthenticationProvider();
+    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
     authProvider.setUserDetailsService(userService.userDetailsService());
     authProvider.setPasswordEncoder(passwordEncoder);
     return authProvider;

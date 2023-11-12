@@ -6,13 +6,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserService {
 
-  boolean existsUserByUsername(String username);
-
-  boolean existsUserByEmail(String email);
-
   User getUserByUsername(String username);
 
   UserDtoRegister save(UserDtoRegister userDto);
 
   UserDetailsService userDetailsService();
+
+  User getAuthenticatedUserByUsername();
 }

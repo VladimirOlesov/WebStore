@@ -1,7 +1,7 @@
 package com.example.webstore.controller;
 
-import com.example.webstore.model.dto.BookDto;
 import com.example.webstore.model.dto.OrderDto;
+import com.example.webstore.model.dto.OrderInfoDto;
 import com.example.webstore.service.OrderService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class OrderController {
 
   // Создание нового заказа
   @PostMapping
-  public ResponseEntity<OrderDto> createOrder(@RequestBody OrderDto orderDto) {
+  public ResponseEntity<OrderDto> createOrder(@RequestBody OrderInfoDto orderDto) {
     return null;
   }
 
@@ -53,22 +53,32 @@ public class OrderController {
     return null;
   }
 
+  // Удаление заказа
+  @DeleteMapping("/{orderId}")
+  public ResponseEntity<Void> removeOrderById(@PathVariable Long orderId) {
+//    orderService.delete(orderId);
+    return ResponseEntity.ok().build();
+  }
+
+
+
   // Добавление книги в корзину
   @PostMapping("/in-cart/{bookId}")
-  public ResponseEntity<BookDto> addToCart(@PathVariable Long bookId) {
-    return null;
+  public ResponseEntity<OrderInfoDto> addToCart(@PathVariable Long bookId) {
+    return ResponseEntity.ok(orderService.addToCart(bookId));
   }
 
   // Удаление книги из корзины
   @DeleteMapping("/in-cart/{bookId}")
   public ResponseEntity<Void> removeFromCart(@PathVariable Long bookId) {
+    orderService.removeFromCart(bookId);
     return ResponseEntity.ok().build();
   }
 
-  // Удаление заказа
-  @DeleteMapping("/{orderId}")
-  public ResponseEntity<Void> removeOrderById(@PathVariable Long orderId) {
-    orderService.delete(orderId);
+  // Очистка корзины от всех книг
+  @DeleteMapping("/empty-cart")
+  public ResponseEntity<Void> clearCart() {
+    orderService.clearCart();
     return ResponseEntity.ok().build();
   }
 }

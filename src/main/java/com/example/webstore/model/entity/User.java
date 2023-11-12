@@ -8,7 +8,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -45,8 +45,8 @@ public class User extends BaseEntity implements UserDetails {
   @Column(name = "phone_number")
   private String phoneNumber;
 
-  @Column(name = "registration_date")
-  private Timestamp registrationDate;
+  @Column(name = "registration_date", columnDefinition = "timestamp")
+  private LocalDateTime registrationDate;
 
   @Column(name = "first_name")
   private String firstName;

@@ -11,6 +11,6 @@ public interface UserMapper {
   @Mapping(source = "password", target = "password", qualifiedBy = EncodedMapping.class)
   User userDtoToUser(UserDtoRegister userDto);
 
-  @Mapping(target = "password", ignore = true)
+  @Mapping(target = "password", constant = "")
   UserDtoRegister convertToDto(User user);
 }

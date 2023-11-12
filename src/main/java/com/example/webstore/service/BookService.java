@@ -21,11 +21,13 @@ public interface BookService {
       SortDirection sortDirection,
       Pageable pageable);
 
-  BookDto getBookById(Long bookId);
+  BookDto getBookDtoById(Long bookId);
 
-  Book getBookByISBN(String isbn);
+  Book getBookById(Long bookId);
 
   void deleteBookById(Long bookId);
 
   String saveBookCover(Long bookId, MultipartFile file);
+
+  byte[] getBookCover(Long bookId);
 }

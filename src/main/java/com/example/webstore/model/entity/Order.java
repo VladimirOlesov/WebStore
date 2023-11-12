@@ -11,7 +11,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -34,8 +34,8 @@ public class Order extends BaseEntity {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  @Column(name = "order_date")
-  private Timestamp orderDate;
+  @Column(name = "order_date", columnDefinition = "timestamp")
+  private LocalDateTime orderDate;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "status")

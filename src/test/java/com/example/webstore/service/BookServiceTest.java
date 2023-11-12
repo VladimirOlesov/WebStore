@@ -33,21 +33,31 @@ class BookServiceTest {
   @InjectMocks
   private BookServiceImpl bookService;
 
+  /**
+   * Тест на обработку случая, когда книга не найдена. Ожидается, что при вызове метода getBookById
+   * с несуществующим ID будет выброшено исключение EntityNotFoundException.
+   */
   @Test
   void getBookByIdWhenBookIsNotFound() {
 
-    doReturn(Optional.empty()).when(bookRepository).findById(BOOK_ID);
+    doReturn(Optional.empty()).when(bookRepository)
+        .findByIdAndIsDeletedIsFalse(BOOK_ID);
 
     assertThatThrownBy(() -> bookService.getBookById(BOOK_ID))
         .isInstanceOf(EntityNotFoundException.class);
   }
 
+  /**
+   * Тест на обработку случая, когда книга найдена. Ожидается, что при вызове метода getBookById с
+   * существующим ID будет возвращен объект книги.
+   */
   @Test
   void getBookByIdWhenBookIsFound() {
 
-    doReturn(Optional.of(new Book(BOOK_ID))).when(bookRepository).findById(BOOK_ID);
+    doReturn(Optional.of(new Book(BOOK_ID))).when(bookRepository)
+        .findByIdAndIsDeletedIsFalse(BOOK_ID);
 
-    var result = bookService.getBookById(BOOK_ID);
+    Book result = bookService.getBookById(BOOK_ID);
 
     assertThat(result).isNotNull();
     assertThat(result.getId()).isEqualTo(BOOK_ID);
@@ -55,7 +65,7 @@ class BookServiceTest {
 
   @AfterEach
   void verifyInteractions() {
-    verify(bookRepository).findById(BOOK_ID);
+    verify(bookRepository).findByIdAndIsDeletedIsFalse(BOOK_ID);
     verifyNoMoreInteractions(bookRepository, bookMapper);
   }
 }

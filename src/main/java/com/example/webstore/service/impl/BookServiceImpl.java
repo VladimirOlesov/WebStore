@@ -1,6 +1,6 @@
 package com.example.webstore.service.impl;
 
-import com.example.webstore.exception.BookCoverStorageException;
+import com.example.webstore.exception.BookCoverException;
 import com.example.webstore.model.BookSpecifications;
 import com.example.webstore.model.dto.BookDto;
 import com.example.webstore.model.entity.Book;
@@ -10,11 +10,14 @@ import com.example.webstore.model.mapper.BookMapper;
 import com.example.webstore.repository.BookRepository;
 import com.example.webstore.service.BookService;
 import jakarta.persistence.EntityNotFoundException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,14 +46,15 @@ public class BookServiceImpl implements BookService {
       SortBy sortBy,
       SortDirection sortDirection,
       Pageable pageable) {
-    var spec = Specification
+    Specification<Book> spec = Specification
         .where(BookSpecifications.titleContains(title))
         .and(BookSpecifications.authorIs(authorId))
         .and(BookSpecifications.genreIs(genreId))
         .and(BookSpecifications.priceBetween(minPrice, maxPrice))
+        .and(BookSpecifications.notDeleted())
         .and(BookSpecifications.orderBy(sortBy, sortDirection));
 
-    var books = bookRepository.findAll(spec, pageable);
+    Page<Book> books = bookRepository.findAll(spec, pageable);
 
     if (books.isEmpty()) {
       throw new EntityNotFoundException("Книги не найдены");
@@ -60,23 +64,22 @@ public class BookServiceImpl implements BookService {
   }
 
   @Override
-  public BookDto getBookById(Long bookId) {
-    var book = bookRepository.findById(bookId)
-        .orElseThrow(() -> new EntityNotFoundException("Книга не найдена"));
-    return bookMapper.bookToBookDto(book);
+  public BookDto getBookDtoById(Long bookId) {
+    return bookMapper.bookToBookDto(getBookById(bookId));
   }
 
   @Override
-  public Book getBookByISBN(String isbn) {
-    return bookRepository.findByISBN(isbn)
+  public Book getBookById(Long bookId) {
+    return bookRepository.findByIdAndIsDeletedIsFalse(bookId)
         .orElseThrow(() -> new EntityNotFoundException("Книга не найдена"));
   }
 
   @Override
   @Transactional
   public void deleteBookById(Long bookId) {
-    bookRepository.delete(bookRepository.findById(bookId)
-        .orElseThrow(() -> new EntityNotFoundException("Книга не найдена")));
+    Book book = getBookById(bookId);
+    book.setIsDeleted(true);
+    bookRepository.save(book);
   }
 
   @Override
@@ -86,14 +89,19 @@ public class BookServiceImpl implements BookService {
       throw new IllegalArgumentException("Файл не передан или пуст");
     }
 
-    var book = bookRepository.findById(bookId)
-        .orElseThrow(() -> new EntityNotFoundException("Книга не найдена"));
+    Book book = getBookById(bookId);
 
-    var filePath = Paths.get(uploadPath, file.getOriginalFilename()).toString();
+    String uniqueFilename = String.format("%s_book_%d.%s",
+        Paths.get(uploadPath).getFileName(),
+        bookId,
+        FilenameUtils.getExtension(file.getOriginalFilename()));
+
+    String filePath = Paths.get(uploadPath).resolve(uniqueFilename).toString();
 
     try {
-      Files.createDirectories(Paths.get(uploadPath));
-
+      if (Files.notExists(Paths.get(uploadPath))) {
+        Files.createDirectories(Paths.get(uploadPath));
+      }
       Files.write(Paths.get(filePath), file.getBytes());
       book.setCoverPath(filePath);
       bookRepository.save(book);
@@ -101,11 +109,25 @@ public class BookServiceImpl implements BookService {
       return filePath;
 
     } catch (IOException e) {
-      if (Files.notExists(Paths.get(uploadPath))) {
-        throw new BookCoverStorageException("Ошибка при создании папки для сохранения обложки");
+
+      throw new BookCoverException("Ошибка при сохранении файла обложки");
+    }
+  }
+
+  @Override
+  public byte[] getBookCover(Long bookId) {
+    Book book = getBookById(bookId);
+
+    Path coverPath = Path.of(book.getCoverPath());
+
+    try {
+      if (Files.exists(coverPath)) {
+        return Files.readAllBytes(coverPath);
       } else {
-        throw new BookCoverStorageException("Ошибка при сохранении файла обложки");
+        throw new FileNotFoundException("Обложка не найдена");
       }
+    } catch (IOException e) {
+      throw new BookCoverException("Ошибка при чтении файла обложки");
     }
   }
 }

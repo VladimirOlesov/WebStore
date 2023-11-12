@@ -38,7 +38,7 @@ public class UserController {
   }
 
   // Загрузка изображения для профиля
-  @PostMapping("/upload-image")
+  @PostMapping("/image")
   public ResponseEntity<Void> uploadProfileImage(@RequestParam("file") MultipartFile file) {
     return null;
   }

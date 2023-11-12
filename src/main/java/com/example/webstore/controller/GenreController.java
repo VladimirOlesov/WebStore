@@ -19,7 +19,7 @@ public class GenreController {
 
   @GetMapping
   public ResponseEntity<List<GenreDto>> gerAuthors(
-      @RequestParam(name = "name", required = false) String name) {
-    return ResponseEntity.ok(genreService.getGenres(name));
+      @RequestParam(name = "name", required = false) String genreName) {
+    return ResponseEntity.ok(genreService.getGenres(genreName));
   }
 }

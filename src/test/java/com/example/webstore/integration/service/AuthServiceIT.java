@@ -1,46 +1,32 @@
-package com.example.webstore.service;
+package com.example.webstore.integration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import com.example.webstore.exception.DuplicateException;
+import com.example.webstore.integration.IntegrationTestBase;
 import com.example.webstore.model.dto.UserDtoRegister;
+import com.example.webstore.model.entity.User;
+import com.example.webstore.model.enums.Role;
 import com.example.webstore.repository.UserRepository;
 import com.example.webstore.service.impl.AuthServiceImpl;
-import org.junit.jupiter.api.AfterEach;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.transaction.annotation.Transactional;
 
-@ExtendWith(MockitoExtension.class)
-class AuthServiceTest {
+@RequiredArgsConstructor
+@Transactional
+class AuthServiceIT extends IntegrationTestBase {
 
-  private static final String EXISTING_USERNAME = "existingUsername";
-  private static final String EXISTING_EMAIL = "existingEmail";
-  private static final String PASSWORD = "password";
+  private static final String USERNAME = "username";
+  private static final String EMAIL = "email";
   private static final String NEW_USERNAME = "newUsername";
   private static final String NEW_EMAIL = "newEmail";
+  private static final String PASSWORD = "password";
+  private static final String PASSWORD_SUCCESSFUL = "";
 
-  @Mock
-  private UserRepository userRepository;
-
-  @Mock
-  private UserService userService;
-
-  @Mock
-  private AuthenticationManager authenticationManager;
-
-  @Mock
-  private JwtService jwtService;
-
-  @InjectMocks
-  private AuthServiceImpl authService;
+  private final AuthServiceImpl authService;
+  private final UserRepository userRepository;
 
   /**
    * Тестирование регистрации пользователя с уже существующим именем пользователя. Ожидается, что
@@ -49,17 +35,21 @@ class AuthServiceTest {
    */
   @Test
   void registerUserWithDuplicateUsername() {
-
-    doReturn(true).when(userRepository).existsByUsername(EXISTING_USERNAME);
+    User user = User.builder()
+        .username(USERNAME)
+        .email(EMAIL)
+        .password(PASSWORD)
+        .role(Role.USER)
+        .build();
+    userRepository.save(user);
 
     assertThatThrownBy(() -> authService.register(UserDtoRegister.builder()
-        .username(EXISTING_USERNAME)
+        .username(USERNAME)
         .email(NEW_EMAIL)
         .password(PASSWORD)
         .build()))
         .isInstanceOf(DuplicateException.class);
 
-    verify(userRepository).existsByUsername(EXISTING_USERNAME);
   }
 
   /**
@@ -69,19 +59,20 @@ class AuthServiceTest {
    */
   @Test
   void registerUserWithDuplicateEmail() {
-
-    doReturn(false).when(userRepository).existsByUsername(NEW_USERNAME);
-    doReturn(true).when(userRepository).existsByEmail(EXISTING_EMAIL);
+    User user = User.builder()
+        .username(USERNAME)
+        .email(EMAIL)
+        .password(PASSWORD)
+        .role(Role.USER)
+        .build();
+    userRepository.save(user);
 
     assertThatThrownBy(() -> authService.register(UserDtoRegister.builder()
         .username(NEW_USERNAME)
-        .email(EXISTING_EMAIL)
+        .email(EMAIL)
         .password(PASSWORD)
         .build()))
         .isInstanceOf(DuplicateException.class);
-
-    verify(userRepository).existsByUsername(NEW_USERNAME);
-    verify(userRepository).existsByEmail(EXISTING_EMAIL);
   }
 
   /**
@@ -95,26 +86,13 @@ class AuthServiceTest {
     UserDtoRegister userDto = UserDtoRegister.builder()
         .username(NEW_USERNAME)
         .email(NEW_EMAIL)
-        .password(PASSWORD)
+        .password(PASSWORD_SUCCESSFUL)
         .build();
-
-    doReturn(false).when(userRepository).existsByUsername(NEW_USERNAME);
-    doReturn(false).when(userRepository).existsByEmail(NEW_EMAIL);
-    doReturn(userDto).when(userService).save(userDto);
 
     UserDtoRegister result = authService.register(userDto);
 
-    assertThat(result).isNotNull();
-    assertThat(result).isEqualTo(userDto);
-
-    verify(userRepository).existsByUsername(NEW_USERNAME);
-    verify(userRepository).existsByEmail(NEW_EMAIL);
-    verify(userService).save(userDto);
-  }
-
-  @AfterEach
-  void verifyInteractions() {
-
-    verifyNoMoreInteractions(userRepository, userService, authenticationManager, jwtService);
+    assertThat(result)
+        .isNotNull()
+        .isEqualTo(userDto);
   }
 }

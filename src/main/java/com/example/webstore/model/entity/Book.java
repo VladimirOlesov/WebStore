@@ -55,6 +55,9 @@ public class Book extends BaseEntity {
   @Column(name = "cover_path")
   private String coverPath;
 
+  @Column(name = "is_deleted", nullable = false)
+  private Boolean isDeleted;
+
   public Book(Long id) {
     this.setId(id);
   }

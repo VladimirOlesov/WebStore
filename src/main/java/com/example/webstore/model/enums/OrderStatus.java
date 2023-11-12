@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum OrderStatus {
   IN_CART("В корзине"),
-  AWAIT_PAYMENT("Ожидает оплаты"),
-  COMPLETED("Завершен");
+  COMPLETED("Завершен"),
+  CANCELLED("Отменен");
 
   public final String displayValue;
 }

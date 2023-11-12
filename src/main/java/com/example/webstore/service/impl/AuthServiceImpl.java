@@ -1,13 +1,13 @@
 package com.example.webstore.service.impl;
 
-import com.example.webstore.exception.DuplicateUserException;
+import com.example.webstore.exception.DuplicateException;
 import com.example.webstore.model.dto.UserDtoRegister;
+import com.example.webstore.model.entity.User;
 import com.example.webstore.repository.UserRepository;
 import com.example.webstore.service.JwtService;
 import com.example.webstore.model.dto.UserDtoLogin;
 import com.example.webstore.service.AuthService;
 import com.example.webstore.service.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
     if (userRepository.existsByUsername(
         userDto.username())
         || userRepository.existsByEmail(userDto.email())) {
-      throw new DuplicateUserException(
+      throw new DuplicateException(
           "Пользователь c таким именем или электронной почтой уже существует");
     }
     return userService.save(userDto);
@@ -45,8 +45,7 @@ public class AuthServiceImpl implements AuthService {
         new UsernamePasswordAuthenticationToken(userDtoLogin.username(),
             userDtoLogin.password()));
 
-    var user = userRepository.findByUsername(userDtoLogin.username())
-        .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+    User user = userService.getUserByUsername(userDtoLogin.username());
     return jwtService.generateToken(user);
   }
 }

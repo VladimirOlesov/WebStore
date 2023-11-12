@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface GenreService {
 
-  List<GenreDto> getGenres(String name);
+  List<GenreDto> getGenres(String genreName);
 }

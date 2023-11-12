@@ -7,7 +7,9 @@ import com.example.webstore.model.mapper.UserMapper;
 import com.example.webstore.repository.UserRepository;
 import com.example.webstore.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,27 +28,27 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public boolean existsUserByUsername(String username) {
-    return userRepository.existsByUsername(username);
-  }
-
-  @Override
-  public boolean existsUserByEmail(String email) {
-    return userRepository.existsByEmail(email);
-  }
-
-  @Override
   @Transactional
   public UserDtoRegister save(UserDtoRegister userDtoRegister) {
-    var user = userMapper.userDtoToUser(userDtoRegister);
+
+    User user = userMapper.userDtoToUser(userDtoRegister);
     user.setRole(Role.USER);
+    user.setRegistrationDate(LocalDateTime.now());
     userRepository.save(user);
     return userMapper.convertToDto(user);
   }
 
   @Override
   public UserDetailsService userDetailsService() {
-    return username -> userRepository.findByUsername(username)
-        .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+    return this::getUserByUsername;
+  }
+
+  @Override
+  public User getAuthenticatedUserByUsername() {
+    String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    if (username == null || username.isEmpty()) {
+      throw new EntityNotFoundException("Пользователь не аутентифицирован");
+    }
+    return getUserByUsername(username);
   }
 }

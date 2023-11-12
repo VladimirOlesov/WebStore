@@ -5,6 +5,5 @@ import java.util.List;
 
 public interface AuthorService {
 
-
-  List<AuthorDto> getAuthors(String name);
+  List<AuthorDto> getAuthors(String authorName);
 }
