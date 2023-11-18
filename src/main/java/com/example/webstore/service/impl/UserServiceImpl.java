@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User getAuthenticatedUserByUsername() {
+  public User getAuthenticatedUser() {
     String username = SecurityContextHolder.getContext().getAuthentication().getName();
     if (username == null || username.isEmpty()) {
       throw new EntityNotFoundException("Пользователь не аутентифицирован");

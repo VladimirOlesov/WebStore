@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
 
-  Optional<Book> findByIdAndIsDeletedIsFalse(Long bookId);
+  Optional<Book> findByISBN(String isbn);
 }

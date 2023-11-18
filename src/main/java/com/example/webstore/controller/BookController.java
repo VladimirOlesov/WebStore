@@ -64,7 +64,8 @@ public class BookController {
   // Получение обложки книги по id
   @GetMapping("/{bookId}/image")
   public ResponseEntity<byte[]> getBookCover(@PathVariable Long bookId) {
-    byte[] coverBytes = bookService.getBookCover(bookId);
-    return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(coverBytes);
+    return ResponseEntity.ok()
+        .contentType(MediaType.IMAGE_JPEG)
+        .body(bookService.getBookCover(bookId));
   }
 }

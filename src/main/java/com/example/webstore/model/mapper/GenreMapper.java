@@ -10,4 +10,6 @@ public interface GenreMapper {
 
   @Mapping(source = "id", target = "genreId")
   GenreDto genreToDto(Genre genre);
+
+  Genre genreDtoToGenre(GenreDto genreDto);
 }

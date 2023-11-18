@@ -1,62 +1,64 @@
 package com.example.webstore.advice;
 
 import com.example.webstore.exception.BookCoverException;
+import com.example.webstore.exception.BookExportException;
 import com.example.webstore.exception.DuplicateException;
 import com.example.webstore.model.dto.ErrorResponseDto;
 import com.example.webstore.model.dto.ValidationErrorDto;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.FileNotFoundException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(DuplicateException.class)
-  public ResponseEntity<ErrorResponseDto> handleDuplicateUserException(
-      DuplicateException e) {
-    ErrorResponseDto errorResponseDto = new ErrorResponseDto(e.getMessage());
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDto);
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ErrorResponseDto handleDuplicateUserException(DuplicateException e) {
+    return new ErrorResponseDto(e.getMessage());
   }
 
   @ExceptionHandler(EntityNotFoundException.class)
-  public ResponseEntity<ErrorResponseDto> handleEntityNotFoundException(
-      EntityNotFoundException e) {
-    ErrorResponseDto errorResponseDto = new ErrorResponseDto(e.getMessage());
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponseDto);
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ErrorResponseDto handleEntityNotFoundException(EntityNotFoundException e) {
+    return new ErrorResponseDto(e.getMessage());
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<ErrorResponseDto> handleIllegalArgumentException(
-      IllegalArgumentException e) {
-    ErrorResponseDto errorResponseDto = new ErrorResponseDto(e.getMessage());
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDto);
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ErrorResponseDto handleIllegalArgumentException(IllegalArgumentException e) {
+    return new ErrorResponseDto(e.getMessage());
   }
 
   @ExceptionHandler(BookCoverException.class)
-  public ResponseEntity<ErrorResponseDto> handleBookCoverStorageException(
-      BookCoverException e) {
-    ErrorResponseDto errorResponseDto = new ErrorResponseDto(e.getMessage());
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponseDto);
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ErrorResponseDto handleBookCoverStorageException(BookCoverException e) {
+    return new ErrorResponseDto(e.getMessage());
+  }
+
+  @ExceptionHandler(BookExportException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ErrorResponseDto handleBookExportException(BookExportException e) {
+    return new ErrorResponseDto(e.getMessage());
   }
 
   @ExceptionHandler(FileNotFoundException.class)
-  public ResponseEntity<ErrorResponseDto> handleFileNotFoundException(
-      FileNotFoundException e) {
-    ErrorResponseDto errorResponseDto = new ErrorResponseDto(e.getMessage());
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponseDto);
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ErrorResponseDto handleFileNotFoundException(FileNotFoundException e) {
+    return new ErrorResponseDto(e.getMessage());
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ValidationErrorDto> handleValidationException(
-      MethodArgumentNotValidException ex) {
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ValidationErrorDto handleValidationException(MethodArgumentNotValidException ex) {
     ValidationErrorDto validationError = new ValidationErrorDto();
     ex.getBindingResult().getFieldErrors().forEach(
         error -> validationError.addFieldError(
             error.getField(), error.getDefaultMessage()));
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationError);
+    return validationError;
   }
 }

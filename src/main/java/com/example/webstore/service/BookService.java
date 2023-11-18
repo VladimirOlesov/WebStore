@@ -30,4 +30,8 @@ public interface BookService {
   String saveBookCover(Long bookId, MultipartFile file);
 
   byte[] getBookCover(Long bookId);
+
+  byte[] exportBooksToExcel();
+
+  BookDto saveBook(BookDto bookDto);
 }

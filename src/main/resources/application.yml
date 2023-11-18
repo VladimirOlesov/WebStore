@@ -20,4 +20,4 @@ jwt:
 book:
   covers:
     upload:
-      path: bookCovers
+      path: C:\Pr\S\WebStore\bookCovers

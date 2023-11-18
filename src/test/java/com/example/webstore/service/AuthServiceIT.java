@@ -1,10 +1,10 @@
-package com.example.webstore.integration.service;
+package com.example.webstore.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.example.webstore.IntegrationTestBase;
 import com.example.webstore.exception.DuplicateException;
-import com.example.webstore.integration.IntegrationTestBase;
 import com.example.webstore.model.dto.UserDtoRegister;
 import com.example.webstore.model.entity.User;
 import com.example.webstore.model.enums.Role;

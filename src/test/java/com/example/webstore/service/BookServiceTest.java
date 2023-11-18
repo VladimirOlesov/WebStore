@@ -41,7 +41,7 @@ class BookServiceTest {
   void getBookByIdWhenBookIsNotFound() {
 
     doReturn(Optional.empty()).when(bookRepository)
-        .findByIdAndIsDeletedIsFalse(BOOK_ID);
+        .findById(BOOK_ID);
 
     assertThatThrownBy(() -> bookService.getBookById(BOOK_ID))
         .isInstanceOf(EntityNotFoundException.class);
@@ -53,9 +53,11 @@ class BookServiceTest {
    */
   @Test
   void getBookByIdWhenBookIsFound() {
+    Book book = new Book();
+    book.setId(BOOK_ID);
 
-    doReturn(Optional.of(new Book(BOOK_ID))).when(bookRepository)
-        .findByIdAndIsDeletedIsFalse(BOOK_ID);
+    doReturn(Optional.of(book)).when(bookRepository)
+        .findById(BOOK_ID);
 
     Book result = bookService.getBookById(BOOK_ID);
 
@@ -65,7 +67,7 @@ class BookServiceTest {
 
   @AfterEach
   void verifyInteractions() {
-    verify(bookRepository).findByIdAndIsDeletedIsFalse(BOOK_ID);
+    verify(bookRepository).findById(BOOK_ID);
     verifyNoMoreInteractions(bookRepository, bookMapper);
   }
 }

@@ -3,8 +3,11 @@ package com.example.webstore.controller;
 import com.example.webstore.model.dto.BookDto;
 import com.example.webstore.service.BookService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,10 +25,10 @@ public class AdminBookController {
 
   private final BookService bookService;
 
-  // Создание новой книги
+  // Сохранение книги
   @PostMapping
   public ResponseEntity<BookDto> createBook(@RequestBody BookDto bookDto) {
-    return null;
+    return ResponseEntity.ok(bookService.saveBook(bookDto));
   }
 
   // Загрузка изображения книги
@@ -47,5 +50,14 @@ public class AdminBookController {
   public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
     bookService.deleteBookById(bookId);
     return ResponseEntity.ok().build();
+  }
+
+  @GetMapping("/to-excel")
+  public ResponseEntity<byte[]> export() {
+    return ResponseEntity.ok()
+        .contentType(MediaType.parseMediaType(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=books.xlsx")
+        .body(bookService.exportBooksToExcel());
   }
 }

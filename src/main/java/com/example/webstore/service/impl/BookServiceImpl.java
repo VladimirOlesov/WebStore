@@ -1,6 +1,7 @@
 package com.example.webstore.service.impl;
 
 import com.example.webstore.exception.BookCoverException;
+import com.example.webstore.exception.BookExportException;
 import com.example.webstore.model.BookSpecifications;
 import com.example.webstore.model.dto.BookDto;
 import com.example.webstore.model.entity.Book;
@@ -10,14 +11,21 @@ import com.example.webstore.model.mapper.BookMapper;
 import com.example.webstore.repository.BookRepository;
 import com.example.webstore.service.BookService;
 import jakarta.persistence.EntityNotFoundException;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -70,7 +78,7 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public Book getBookById(Long bookId) {
-    return bookRepository.findByIdAndIsDeletedIsFalse(bookId)
+    return bookRepository.findById(bookId)
         .orElseThrow(() -> new EntityNotFoundException("Книга не найдена"));
   }
 
@@ -78,7 +86,7 @@ public class BookServiceImpl implements BookService {
   @Transactional
   public void deleteBookById(Long bookId) {
     Book book = getBookById(bookId);
-    book.setIsDeleted(true);
+    book.setDeleted(true);
     bookRepository.save(book);
   }
 
@@ -91,8 +99,7 @@ public class BookServiceImpl implements BookService {
 
     Book book = getBookById(bookId);
 
-    String uniqueFilename = String.format("%s_book_%d.%s",
-        Paths.get(uploadPath).getFileName(),
+    String uniqueFilename = String.format("book_%d.%s",
         bookId,
         FilenameUtils.getExtension(file.getOriginalFilename()));
 
@@ -129,5 +136,52 @@ public class BookServiceImpl implements BookService {
     } catch (IOException e) {
       throw new BookCoverException("Ошибка при чтении файла обложки");
     }
+  }
+
+  @Override
+  public byte[] exportBooksToExcel() {
+    List<BookDto> books = bookRepository.findAll().stream()
+        .map(bookMapper::bookToBookDto)
+        .toList();
+
+    try (Workbook workbook = new XSSFWorkbook();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+      Sheet sheet = workbook.createSheet("Books");
+
+      Row headerRow = sheet.createRow(0);
+      String[] columns = {"Title", "Author", "Genre", "Publication Year", "Price", "ISBN",
+          "Page Count", "Age Rating"};
+      for (int i = 0; i < columns.length; i++) {
+        Cell cell = headerRow.createCell(i);
+        cell.setCellValue(columns[i]);
+      }
+
+      int rowNum = 1;
+      for (BookDto book : books) {
+        Row row = sheet.createRow(rowNum++);
+        row.createCell(0).setCellValue(book.title());
+        row.createCell(1).setCellValue(book.author().authorName());
+        row.createCell(2).setCellValue(book.genre().genreName());
+        row.createCell(3).setCellValue(book.publicationYear());
+        row.createCell(4).setCellValue(book.price().doubleValue());
+        row.createCell(5).setCellValue(book.ISBN());
+        row.createCell(6).setCellValue(book.pageCount());
+        row.createCell(7).setCellValue(book.ageRating());
+      }
+      workbook.write(outputStream);
+
+      return outputStream.toByteArray();
+
+    } catch (IOException e) {
+      throw new BookExportException("Ошибка при выгрузке книг в Excel");
+    }
+  }
+
+  @Override
+  @Transactional
+  public BookDto saveBook(BookDto bookDto) {
+    Book book = bookRepository.findByISBN(bookDto.ISBN())
+        .orElseGet(() -> bookRepository.save(bookMapper.bookDtoToBook(bookDto)));
+    return bookMapper.bookToBookDto(bookRepository.save(book));
   }
 }

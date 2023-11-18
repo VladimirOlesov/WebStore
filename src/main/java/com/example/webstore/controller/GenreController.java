@@ -1,6 +1,7 @@
 package com.example.webstore.controller;
 
 import com.example.webstore.model.dto.GenreDto;
+import com.example.webstore.model.enums.SortDirection;
 import com.example.webstore.service.GenreService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,9 @@ public class GenreController {
   private final GenreService genreService;
 
   @GetMapping
-  public ResponseEntity<List<GenreDto>> gerAuthors(
-      @RequestParam(name = "name", required = false) String genreName) {
-    return ResponseEntity.ok(genreService.getGenres(genreName));
+  public ResponseEntity<List<GenreDto>> getGenres(
+      @RequestParam(name = "genreName", required = false) String genreName,
+      @RequestParam(name = "sortDirection", required = false) SortDirection sortDirection) {
+    return ResponseEntity.ok(genreService.getGenres(genreName, sortDirection));
   }
 }

@@ -12,5 +12,5 @@ public interface UserService {
 
   UserDetailsService userDetailsService();
 
-  User getAuthenticatedUserByUsername();
+  User getAuthenticatedUser();
 }

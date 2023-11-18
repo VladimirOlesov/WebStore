@@ -72,6 +72,6 @@ public class BookSpecifications {
   }
 
   public static Specification<Book> notDeleted() {
-    return ((root, query, criteriaBuilder) -> criteriaBuilder.isFalse(root.get(Book_.isDeleted)));
+    return ((root, query, criteriaBuilder) -> criteriaBuilder.isFalse(root.get(Book_.deleted)));
   }
 }

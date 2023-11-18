@@ -1,6 +1,7 @@
 package com.example.webstore.model.entity;
 
 import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -13,8 +14,10 @@ import lombok.Data;
 import java.math.BigDecimal;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldNameConstants;
 
 @Builder
+@FieldNameConstants
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -28,12 +31,12 @@ public class Book extends BaseEntity {
   private String title;
 
   @NotNull
-  @ManyToOne
+  @ManyToOne (cascade = CascadeType.PERSIST)
   @JoinColumn(name = "author_id", nullable = false)
   private Author author;
 
   @NotNull
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "genre_id", nullable = false)
   private Genre genre;
 
@@ -55,10 +58,6 @@ public class Book extends BaseEntity {
   @Column(name = "cover_path")
   private String coverPath;
 
-  @Column(name = "is_deleted", nullable = false)
-  private Boolean isDeleted;
-
-  public Book(Long id) {
-    this.setId(id);
-  }
+  @Column(name = "deleted", nullable = false)
+  private Boolean deleted;
 }

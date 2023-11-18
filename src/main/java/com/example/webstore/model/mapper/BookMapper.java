@@ -8,5 +8,7 @@ import org.mapstruct.Mapper;
     uses = {AuthorMapper.class, GenreMapper.class})
 public interface BookMapper {
 
+  Book bookDtoToBook(BookDto bookDto);
+
   BookDto bookToBookDto(Book book);
 }

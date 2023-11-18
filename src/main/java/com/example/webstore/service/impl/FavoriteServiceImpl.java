@@ -32,7 +32,7 @@ public class FavoriteServiceImpl implements FavoriteService {
   @Override
   @Transactional
   public void removeFromFavorites(Long bookId) {
-    User user = userService.getAuthenticatedUserByUsername();
+    User user = userService.getAuthenticatedUser();
 
     Favorite favorite = favoriteRepository.findByUserIdAndBookId(user.getId(), bookId)
         .orElseThrow(() -> new EntityNotFoundException("Книга не найдена в избранном"));
@@ -43,7 +43,7 @@ public class FavoriteServiceImpl implements FavoriteService {
   @Override
   @Transactional
   public FavoriteIdDto addToFavorites(Long bookId) {
-    User user = userService.getAuthenticatedUserByUsername();
+    User user = userService.getAuthenticatedUser();
 
     Book book = bookRepository.findById(bookId)
         .orElseThrow(() -> new EntityNotFoundException("Книга не найдена"));
@@ -58,7 +58,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
   @Override
   public List<BookDto> getFavoriteBooks() {
-    User user = userService.getAuthenticatedUserByUsername();
+    User user = userService.getAuthenticatedUser();
 
     List<Favorite> favoriteBooks = favoriteRepository.findByUserId(user.getId());
 

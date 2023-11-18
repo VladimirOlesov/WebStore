@@ -22,5 +22,5 @@ CREATE TABLE books
     page_count       int,
     age_rating       int,
     cover_path       varchar(255),
-    is_deleted       boolean      not null default false
+    deleted          boolean      not null default false
 );

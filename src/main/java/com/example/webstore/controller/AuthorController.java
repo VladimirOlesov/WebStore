@@ -1,6 +1,7 @@
 package com.example.webstore.controller;
 
 import com.example.webstore.model.dto.AuthorDto;
+import com.example.webstore.model.enums.SortDirection;
 import com.example.webstore.service.AuthorService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,8 @@ public class AuthorController {
 
   @GetMapping
   public ResponseEntity<List<AuthorDto>> gerAuthors(
-      @RequestParam(name = "name", required = false) String authorName) {
-    return ResponseEntity.ok(authorService.getAuthors(authorName));
+      @RequestParam(name = "authorName", required = false) String authorName,
+      @RequestParam(name = "sortDirection", required = false) SortDirection sortDirection) {
+    return ResponseEntity.ok(authorService.getAuthors(authorName, sortDirection));
   }
 }
