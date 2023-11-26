@@ -18,7 +18,7 @@ import lombok.experimental.FieldNameConstants;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@AttributeOverride(name = "Id", column = @Column(name = "genre_id"))
+@AttributeOverride(name = "id", column = @Column(name = "genre_id"))
 @Table(name = "genres")
 public class Genre extends BaseEntity {
 

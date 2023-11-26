@@ -16,17 +16,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldNameConstants;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Builder
+@FieldNameConstants
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@AttributeOverride(name = "Id", column = @Column(name = "user_id"))
+@AttributeOverride(name = "id", column = @Column(name = "user_id"))
 @Table(name = "users")
 public class User extends BaseEntity implements UserDetails {
 

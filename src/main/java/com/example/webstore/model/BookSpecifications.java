@@ -28,7 +28,7 @@ public class BookSpecifications {
       if (authorId == null) {
         return criteriaBuilder.conjunction();
       }
-      return criteriaBuilder.equal(root.get(Book_.author).get(Author_.Id), authorId);
+      return criteriaBuilder.equal(root.get(Book_.author).get(Author_.id), authorId);
     };
   }
 
@@ -37,7 +37,7 @@ public class BookSpecifications {
       if (genreId == null) {
         return criteriaBuilder.conjunction();
       }
-      return criteriaBuilder.equal(root.get(Book_.genre).get(Genre_.Id), genreId);
+      return criteriaBuilder.equal(root.get(Book_.genre).get(Genre_.id), genreId);
     };
   }
 

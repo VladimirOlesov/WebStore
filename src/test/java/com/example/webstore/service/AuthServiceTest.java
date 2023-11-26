@@ -1,5 +1,8 @@
 package com.example.webstore.service;
 
+import static com.example.webstore.model.dto.UserDtoRegister.Fields.email;
+import static com.example.webstore.model.dto.UserDtoRegister.Fields.password;
+import static com.example.webstore.model.dto.UserDtoRegister.Fields.username;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
@@ -23,9 +26,6 @@ class AuthServiceTest {
 
   private static final String EXISTING_USERNAME = "existingUsername";
   private static final String EXISTING_EMAIL = "existingEmail";
-  private static final String PASSWORD = "password";
-  private static final String NEW_USERNAME = "newUsername";
-  private static final String NEW_EMAIL = "newEmail";
 
   @Mock
   private UserRepository userRepository;
@@ -42,6 +42,14 @@ class AuthServiceTest {
   @InjectMocks
   private AuthServiceImpl authService;
 
+  private UserDtoRegister createTestUserDto(String username, String email) {
+    return UserDtoRegister.builder()
+        .username(username)
+        .email(email)
+        .password(password)
+        .build();
+  }
+
   /**
    * Тестирование регистрации пользователя с уже существующим именем пользователя. Ожидается, что
    * при попытке регистрации пользователя с уже существующим именем, будет выброшено исключение
@@ -52,12 +60,10 @@ class AuthServiceTest {
 
     doReturn(true).when(userRepository).existsByUsername(EXISTING_USERNAME);
 
-    assertThatThrownBy(() -> authService.register(UserDtoRegister.builder()
-        .username(EXISTING_USERNAME)
-        .email(NEW_EMAIL)
-        .password(PASSWORD)
-        .build()))
-        .isInstanceOf(DuplicateException.class);
+    assertThatThrownBy(
+        () -> authService.register(createTestUserDto(EXISTING_USERNAME, email)))
+        .isInstanceOf(DuplicateException.class)
+        .hasMessage("Пользователь c таким именем или электронной почтой уже существует");
 
     verify(userRepository).existsByUsername(EXISTING_USERNAME);
   }
@@ -70,17 +76,15 @@ class AuthServiceTest {
   @Test
   void registerUserWithDuplicateEmail() {
 
-    doReturn(false).when(userRepository).existsByUsername(NEW_USERNAME);
+    doReturn(false).when(userRepository).existsByUsername(username);
     doReturn(true).when(userRepository).existsByEmail(EXISTING_EMAIL);
 
-    assertThatThrownBy(() -> authService.register(UserDtoRegister.builder()
-        .username(NEW_USERNAME)
-        .email(EXISTING_EMAIL)
-        .password(PASSWORD)
-        .build()))
-        .isInstanceOf(DuplicateException.class);
+    assertThatThrownBy(
+        () -> authService.register(createTestUserDto(username, EXISTING_EMAIL)))
+        .isInstanceOf(DuplicateException.class)
+        .hasMessage("Пользователь c таким именем или электронной почтой уже существует");
 
-    verify(userRepository).existsByUsername(NEW_USERNAME);
+    verify(userRepository).existsByUsername(username);
     verify(userRepository).existsByEmail(EXISTING_EMAIL);
   }
 
@@ -91,15 +95,10 @@ class AuthServiceTest {
    */
   @Test
   void registerUserSuccessfully() {
+    UserDtoRegister userDto = createTestUserDto(username, email);
 
-    UserDtoRegister userDto = UserDtoRegister.builder()
-        .username(NEW_USERNAME)
-        .email(NEW_EMAIL)
-        .password(PASSWORD)
-        .build();
-
-    doReturn(false).when(userRepository).existsByUsername(NEW_USERNAME);
-    doReturn(false).when(userRepository).existsByEmail(NEW_EMAIL);
+    doReturn(false).when(userRepository).existsByUsername(username);
+    doReturn(false).when(userRepository).existsByEmail(email);
     doReturn(userDto).when(userService).save(userDto);
 
     UserDtoRegister result = authService.register(userDto);
@@ -107,8 +106,8 @@ class AuthServiceTest {
     assertThat(result).isNotNull();
     assertThat(result).isEqualTo(userDto);
 
-    verify(userRepository).existsByUsername(NEW_USERNAME);
-    verify(userRepository).existsByEmail(NEW_EMAIL);
+    verify(userRepository).existsByUsername(username);
+    verify(userRepository).existsByEmail(email);
     verify(userService).save(userDto);
   }
 

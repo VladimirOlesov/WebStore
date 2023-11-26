@@ -31,11 +31,15 @@ public class OrderController {
     return null;
   }
 
-
   // Добавление книги в корзину
   @PostMapping("/in-cart/{bookId}")
   public ResponseEntity<OrderDto> addToCart(@PathVariable Long bookId) {
     return ResponseEntity.ok(orderService.addToCart(bookId));
+  }
+
+  @GetMapping("/cart")
+  public ResponseEntity<OrderDto> getCart() {
+    return ResponseEntity.ok(orderService.getCart());
   }
 
   // Удаление книги из корзины

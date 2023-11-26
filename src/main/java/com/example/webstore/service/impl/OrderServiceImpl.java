@@ -14,6 +14,7 @@ import com.example.webstore.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +32,15 @@ public class OrderServiceImpl implements OrderService {
   private final OrderMapper orderMapper;
 
   @Override
-  public Order getCart() {
+  public OrderDto getCart() {
+    User user = userService.getAuthenticatedUser();
+    return orderRepository.findByUserIdAndStatusWithBooks(user.getId(), OrderStatus.IN_CART)
+        .map(orderMapper::toOrderDto)
+        .orElse(OrderDto.builder().books(Set.of()).build());
+  }
+
+  @Override
+  public Order getCartInternal() {
     User user = userService.getAuthenticatedUser();
     return orderRepository.findByUserIdAndStatus(user.getId(), OrderStatus.IN_CART)
         .orElseThrow(() -> new EntityNotFoundException("Корзина не найдена"));
@@ -63,14 +72,12 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public void removeFromCart(Long bookId) {
-    Order cartOrder = getCart();
+    Order cartOrder = getCartInternal();
     Book bookToRemove = bookService.getBookById(bookId);
 
-    if (!cartOrder.getBooks().contains(bookToRemove)) {
+    if (!cartOrder.getBooks().remove(bookToRemove)) {
       throw new EntityNotFoundException("Книга не найдена в корзине");
     }
-
-    cartOrder.getBooks().remove(bookToRemove);
 
     if (cartOrder.getBooks().isEmpty()) {
       orderRepository.delete(cartOrder);
@@ -82,13 +89,13 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public void clearCart() {
-    orderRepository.delete(getCart());
+    orderRepository.delete(getCartInternal());
   }
 
   @Override
   @Transactional
   public OrderDto confirmOrder() {
-    Order cartOrder = getCart();
+    Order cartOrder = getCartInternal();
 
     cartOrder.setStatus(OrderStatus.COMPLETED);
     cartOrder.setOrderDate(LocalDateTime.now());
@@ -101,7 +108,6 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public void cancelOrder(Long orderId) {
-
     User user = userService.getAuthenticatedUser();
 
     Order confirmedOrder = orderRepository.findByIdAndUserIdAndStatus(orderId, user.getId(),

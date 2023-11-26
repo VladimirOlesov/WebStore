@@ -14,7 +14,6 @@ import com.example.webstore.service.FavoriteService;
 import com.example.webstore.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +67,6 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     return favoriteBooks.stream()
         .map(favorite -> bookMapper.bookToBookDto(favorite.getBook()))
-        .collect(Collectors.toList());
+        .toList();
   }
 }

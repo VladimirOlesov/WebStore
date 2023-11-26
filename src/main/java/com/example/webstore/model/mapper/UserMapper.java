@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = PasswordEncoderMapper.class)
 public interface UserMapper {
 
-  @Mapping(source = "password", target = "password", qualifiedBy = EncodedMapping.class)
+  @Mapping(source = "password", target = "password", qualifiedBy = CustomMapping.class)
   User userDtoToUser(UserDtoRegister userDto);
 
   @Mapping(target = "password", constant = "")

@@ -5,8 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
+import lombok.experimental.FieldNameConstants;
 
 @Builder
+@FieldNameConstants
 public record UserDtoRegister(
     @Pattern(
         regexp = "^[a-zA-Z0-9_]+$",

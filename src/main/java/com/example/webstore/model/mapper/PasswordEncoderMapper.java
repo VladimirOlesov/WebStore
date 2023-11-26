@@ -10,7 +10,7 @@ public class PasswordEncoderMapper {
 
   private final PasswordEncoder passwordEncoder;
 
-  @EncodedMapping
+  @CustomMapping
   public String encodePassword(String password) {
     return passwordEncoder.encode(password);
   }

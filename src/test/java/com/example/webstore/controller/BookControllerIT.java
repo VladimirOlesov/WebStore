@@ -13,7 +13,9 @@ import com.example.webstore.IntegrationTestBase;
 import com.example.webstore.model.entity.Author;
 import com.example.webstore.model.entity.Book;
 import com.example.webstore.model.entity.Genre;
+import com.example.webstore.repository.AuthorRepository;
 import com.example.webstore.repository.BookRepository;
+import com.example.webstore.repository.GenreRepository;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
@@ -30,22 +32,36 @@ class BookControllerIT extends IntegrationTestBase {
 
   private final BookRepository bookRepository;
 
+  private final AuthorRepository authorRepository;
+
+  private final GenreRepository genreRepository;
+
   private static final Long NON_EXISTENT_BOOK_ID = 999L;
 
   @Test
   void successfulGetBookById() throws Exception {
-    Book book = bookRepository.save(Book.builder()
-        .title("title")
-        .author(Author.builder().authorName(authorName).build())
-        .genre(Genre.builder().genreName(genreName).build())
-        .publicationYear(2000)
-        .price(new BigDecimal("500.00"))
-        .ISBN("ISBN")
-        .pageCount(500)
-        .ageRating(16)
-        .coverPath("coverPath")
-        .deleted(false)
-        .build());
+    Book book = bookRepository.save(
+        Book.builder()
+            .title("title")
+            .author(authorRepository.save(
+                Author.builder()
+                    .authorName(authorName)
+                    .build())
+            )
+            .genre(genreRepository.save(
+                Genre.builder()
+                    .genreName(genreName)
+                    .build())
+            )
+            .publicationYear(2000)
+            .price(new BigDecimal("500.00"))
+            .ISBN("ISBN")
+            .pageCount(500)
+            .ageRating(16)
+            .coverPath("coverPath")
+            .deleted(false)
+            .build()
+    );
 
     mockMvc.perform(get("/books/" + book.getId())
 

@@ -5,7 +5,9 @@ import com.example.webstore.model.entity.Order;
 
 public interface OrderService {
 
-  Order getCart();
+  OrderDto getCart();
+
+  Order getCartInternal();
 
   OrderDto addToCart(Long bookId);
 

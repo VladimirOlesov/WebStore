@@ -1,5 +1,8 @@
 package com.example.webstore.service;
 
+import static com.example.webstore.model.entity.User.Fields.email;
+import static com.example.webstore.model.entity.User.Fields.password;
+import static com.example.webstore.model.entity.User.Fields.username;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -18,15 +21,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class AuthServiceIT extends IntegrationTestBase {
 
-  private static final String USERNAME = "username";
-  private static final String EMAIL = "email";
   private static final String NEW_USERNAME = "newUsername";
   private static final String NEW_EMAIL = "newEmail";
-  private static final String PASSWORD = "password";
   private static final String PASSWORD_SUCCESSFUL = "";
 
   private final AuthServiceImpl authService;
   private final UserRepository userRepository;
+
+  private void createTestUser() {
+    userRepository.save(
+        User.builder()
+            .username(username)
+            .email(email)
+            .password(password)
+            .role(Role.USER)
+            .build());
+  }
 
   /**
    * Тестирование регистрации пользователя с уже существующим именем пользователя. Ожидается, что
@@ -35,20 +45,15 @@ class AuthServiceIT extends IntegrationTestBase {
    */
   @Test
   void registerUserWithDuplicateUsername() {
-    User user = User.builder()
-        .username(USERNAME)
-        .email(EMAIL)
-        .password(PASSWORD)
-        .role(Role.USER)
-        .build();
-    userRepository.save(user);
+    createTestUser();
 
     assertThatThrownBy(() -> authService.register(UserDtoRegister.builder()
-        .username(USERNAME)
+        .username(username)
         .email(NEW_EMAIL)
-        .password(PASSWORD)
+        .password(password)
         .build()))
-        .isInstanceOf(DuplicateException.class);
+        .isInstanceOf(DuplicateException.class)
+        .hasMessage("Пользователь c таким именем или электронной почтой уже существует");
 
   }
 
@@ -59,20 +64,15 @@ class AuthServiceIT extends IntegrationTestBase {
    */
   @Test
   void registerUserWithDuplicateEmail() {
-    User user = User.builder()
-        .username(USERNAME)
-        .email(EMAIL)
-        .password(PASSWORD)
-        .role(Role.USER)
-        .build();
-    userRepository.save(user);
+    createTestUser();
 
     assertThatThrownBy(() -> authService.register(UserDtoRegister.builder()
         .username(NEW_USERNAME)
-        .email(EMAIL)
-        .password(PASSWORD)
+        .email(email)
+        .password(password)
         .build()))
-        .isInstanceOf(DuplicateException.class);
+        .isInstanceOf(DuplicateException.class)
+        .hasMessage("Пользователь c таким именем или электронной почтой уже существует");
   }
 
   /**
@@ -82,7 +82,6 @@ class AuthServiceIT extends IntegrationTestBase {
    */
   @Test
   void registerUserSuccessfully() {
-
     UserDtoRegister userDto = UserDtoRegister.builder()
         .username(NEW_USERNAME)
         .email(NEW_EMAIL)

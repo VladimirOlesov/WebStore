@@ -1,7 +1,7 @@
 package com.example.webstore.repository;
 
 import static com.example.webstore.model.entity.Author.Fields.authorName;
-import static com.example.webstore.model.entity.BaseEntity.Fields.Id;
+import static com.example.webstore.model.entity.BaseEntity.Fields.id;
 import static com.example.webstore.model.entity.Book.Fields.author;
 import static com.example.webstore.model.entity.Book.Fields.deleted;
 import static com.example.webstore.model.entity.Book.Fields.genre;
@@ -24,6 +24,10 @@ public class BookRepositoryIT extends IntegrationTestBase {
 
   private final BookRepository bookRepository;
 
+  private final AuthorRepository authorRepository;
+
+  private final GenreRepository genreRepository;
+
   /**
    * Тестирование сохранения книги в базе данных. Ожидается, что сохраненная книга не является null,
    * имеет идентификатор и соответствует переданным данным.
@@ -33,8 +37,16 @@ public class BookRepositoryIT extends IntegrationTestBase {
 
     Book book = Book.builder()
         .title("title")
-        .author(Author.builder().authorName(authorName).build())
-        .genre(Genre.builder().genreName(genreName).build())
+        .author(authorRepository.save(
+            Author.builder()
+                .authorName(authorName)
+                .build())
+        )
+        .genre(genreRepository.save(
+            Genre.builder()
+                .genreName(genreName)
+                .build())
+        )
         .ISBN("ISBN")
         .deleted(false)
         .build();
@@ -45,7 +57,7 @@ public class BookRepositoryIT extends IntegrationTestBase {
 
     assertThat(foundBook)
         .isNotNull()
-        .hasFieldOrPropertyWithValue(Id, savedBook.getId())
+        .hasFieldOrPropertyWithValue(id, savedBook.getId())
         .hasFieldOrPropertyWithValue(title, "title")
         .hasFieldOrPropertyWithValue(author, book.getAuthor())
         .hasFieldOrPropertyWithValue(genre, book.getGenre())

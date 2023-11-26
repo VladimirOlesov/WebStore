@@ -1,7 +1,6 @@
 package com.example.webstore.model.entity;
 
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -23,7 +22,7 @@ import lombok.experimental.FieldNameConstants;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@AttributeOverride(name = "Id", column = @Column(name = "book_id"))
+@AttributeOverride(name = "id", column = @Column(name = "book_id"))
 @Table(name = "books")
 public class Book extends BaseEntity {
 
@@ -31,12 +30,12 @@ public class Book extends BaseEntity {
   private String title;
 
   @NotNull
-  @ManyToOne (cascade = CascadeType.PERSIST)
+  @ManyToOne
   @JoinColumn(name = "author_id", nullable = false)
   private Author author;
 
   @NotNull
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne
   @JoinColumn(name = "genre_id", nullable = false)
   private Genre genre;
 

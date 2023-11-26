@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -28,6 +29,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -140,9 +142,16 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public byte[] exportBooksToExcel() {
-    List<BookDto> books = bookRepository.findAll().stream()
-        .map(bookMapper::bookToBookDto)
+
+    List<BookDto> allBooks = Stream.iterate(0, i -> i + 1)
+        .map(pageNumber -> bookRepository.findAll(PageRequest.of(pageNumber, 5)))
+        .takeWhile(Page::hasNext)
+        .flatMap(bookPage -> bookPage.stream().map(bookMapper::bookToBookDto))
         .toList();
+
+    if (allBooks.isEmpty()) {
+      throw new BookExportException("Нет данных для экспорта");
+    }
 
     try (Workbook workbook = new XSSFWorkbook();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -150,14 +159,14 @@ public class BookServiceImpl implements BookService {
 
       Row headerRow = sheet.createRow(0);
       String[] columns = {"Title", "Author", "Genre", "Publication Year", "Price", "ISBN",
-          "Page Count", "Age Rating"};
+          "Page Count", "Age Rating", "Cover Path", "Deleted"};
       for (int i = 0; i < columns.length; i++) {
         Cell cell = headerRow.createCell(i);
         cell.setCellValue(columns[i]);
       }
 
       int rowNum = 1;
-      for (BookDto book : books) {
+      for (BookDto book : allBooks) {
         Row row = sheet.createRow(rowNum++);
         row.createCell(0).setCellValue(book.title());
         row.createCell(1).setCellValue(book.author().authorName());
@@ -167,6 +176,8 @@ public class BookServiceImpl implements BookService {
         row.createCell(5).setCellValue(book.ISBN());
         row.createCell(6).setCellValue(book.pageCount());
         row.createCell(7).setCellValue(book.ageRating());
+        row.createCell(8).setCellValue(book.coverPath());
+        row.createCell(9).setCellValue(book.deleted());
       }
       workbook.write(outputStream);
 
@@ -180,8 +191,7 @@ public class BookServiceImpl implements BookService {
   @Override
   @Transactional
   public BookDto saveBook(BookDto bookDto) {
-    Book book = bookRepository.findByISBN(bookDto.ISBN())
-        .orElseGet(() -> bookRepository.save(bookMapper.bookDtoToBook(bookDto)));
-    return bookMapper.bookToBookDto(bookRepository.save(book));
+    return bookMapper.bookToBookDto(bookRepository.findByISBN(bookDto.ISBN())
+        .orElseGet(() -> bookRepository.save(bookMapper.bookDtoToBook(bookDto))));
   }
 }
