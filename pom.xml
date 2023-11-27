@@ -28,6 +28,7 @@
     <hibernate-jpamodelgen>6.2.7.Final</hibernate-jpamodelgen>
     <commons-io>2.13.0</commons-io>
     <apache-poi>5.2.3</apache-poi>
+    <docker-compose>3.1.6</docker-compose>
   </properties>
   <dependencies>
     <dependency>
@@ -94,6 +95,7 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-docker-compose</artifactId>
+      <version>${docker-compose}</version>
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
