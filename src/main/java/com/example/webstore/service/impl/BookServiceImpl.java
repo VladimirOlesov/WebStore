@@ -101,11 +101,11 @@ public class BookServiceImpl implements BookService {
 
     Book book = getBookById(bookId);
 
-    String uniqueFilename = String.format("book_%d.%s",
-        bookId,
+    String uniqueFilename = String.format("book_%d.%s", bookId,
         FilenameUtils.getExtension(file.getOriginalFilename()));
 
-    String filePath = Paths.get(uploadPath).resolve(uniqueFilename).toString();
+    String filePath = Paths.get(uploadPath).resolve(uniqueFilename).toString()
+        .replace("/", "\\");
 
     try {
       if (Files.notExists(Paths.get(uploadPath))) {
@@ -145,7 +145,7 @@ public class BookServiceImpl implements BookService {
 
     List<BookDto> allBooks = Stream.iterate(0, i -> i + 1)
         .map(pageNumber -> bookRepository.findAll(PageRequest.of(pageNumber, 5)))
-        .takeWhile(Page::hasNext)
+        .takeWhile(page -> !page.getContent().isEmpty())
         .flatMap(bookPage -> bookPage.stream().map(bookMapper::bookToBookDto))
         .toList();
 

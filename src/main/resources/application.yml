@@ -21,3 +21,6 @@ book:
   covers:
     upload:
       path: C:\Pr\S\WebStore\bookCovers
+
+server:
+  port: 8080

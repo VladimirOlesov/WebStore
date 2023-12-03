@@ -8,5 +8,4 @@ public interface AuthService {
   UserDtoRegister register(UserDtoRegister userDto);
 
   String authenticate(UserDtoLogin userDto);
-
 }

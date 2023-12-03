@@ -8,5 +8,4 @@ import org.mapstruct.Mapper;
 public interface FavoriteMapper {
 
   FavoriteIdDto favoriteIdToDto(FavoriteId favoriteId);
-
 }

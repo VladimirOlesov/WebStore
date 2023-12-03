@@ -57,7 +57,6 @@ class AuthServiceTest {
    */
   @Test
   void registerUserWithDuplicateUsername() {
-
     doReturn(true).when(userRepository).existsByUsername(EXISTING_USERNAME);
 
     assertThatThrownBy(
@@ -75,7 +74,6 @@ class AuthServiceTest {
    */
   @Test
   void registerUserWithDuplicateEmail() {
-
     doReturn(false).when(userRepository).existsByUsername(username);
     doReturn(true).when(userRepository).existsByEmail(EXISTING_EMAIL);
 
@@ -113,7 +111,6 @@ class AuthServiceTest {
 
   @AfterEach
   void verifyInteractions() {
-
     verifyNoMoreInteractions(userRepository, userService, authenticationManager, jwtService);
   }
 }

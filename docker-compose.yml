@@ -7,8 +7,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: web_store_local_db
-    volumes:
-      - /c/Users/Vladimir/postgres-local:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
